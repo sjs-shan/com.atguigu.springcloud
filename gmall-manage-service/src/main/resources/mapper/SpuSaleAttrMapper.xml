@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 表示接口的全路径 -->
+<mapper namespace="com.atguigu.gmall0218.service.mapper.SpuSaleAttrMapper">
+    <!--resultmap 表示返回结果集
+        id   表示唯一标识
+        type 表示返回结果集数据类型
+        autoMapping 自动映射
+     -->
+    <resultMap id="spuSaleAttrMap " type="com.atguigu.gmall0218.bean.SpuSaleAttr"
+               autoMapping="true">
+        <!--
+        id表示主键
+        property 表示实体类的属性名
+        column 表示表中的字段名
+        -->
+        <id property="id"   column="id"></id>
+        <!--
+        collection 表示一对多
+        ofType表示返回集合的属性对象
+        -->
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall0218.bean.SpuSaleAttrValue"
+                    autoMapping="true" >
+            <id property="id" column="sale_attr_value_id"></id>
+        </collection>
+
+        <!--association表示多对一 -->
+
+    </resultMap>
+    <select id="selectSpuSaleAttrList" resultMap="spuSaleAttrMap">
+
+        select sa.id ,sa.spu_id,sa.sale_attr_name,sa.sale_attr_id,
+        sv.id sale_attr_value_id,
+        sv.sale_attr_value_name
+         from spu_sale_attr sa inner join spu_sale_attr_value sv
+         on sa.spu_id=sv.spu_id and sa.sale_attr_id=sv.sale_attr_id
+         where sa.spu_id=#{0}
+
+
+    </select>
+
+    <select id="selectSpuSaleAttrListCheckBySku" resultMap="spuSaleAttrMap">
+        select sa.id ,sa.spu_id, sa.sale_attr_name,sa.sale_attr_id,
+            sv.id sale_attr_value_id,
+            sv.sale_attr_value_name,
+            skv.sku_id,
+            IF(skv.sku_id IS NULL,0,1)  is_checked
+         from spu_sale_attr ssa
+         inner join spu_sale_attr_value ssav
+         on ssa.spu_id=ssav.spu_id and ssa.sale_attr_id=ssav.sale_attr_id
+         left join sku_sale_attr_value skv
+         on skv.sale_attr_id=ssa.sale_attr_id
+         and skv.sale_attr_value_id=ssav.id
+         and skv.sku_id=#{arg0}
+         where ssa.spu_id=#{arg1}
+         order by ssav.sale_attr_id,ssav.id
+
+
+
+
+    </select>
+
+</mapper>
